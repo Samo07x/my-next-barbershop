@@ -2,20 +2,121 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Base colors */
+    --background: 40 33% 98%; /* Light cream background */
+    --foreground: 220 40% 15%; /* Dark navy text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 40% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 40% 15%;
+
+    /* Primary: Dark Red */
+    --primary: 0 100% 27%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Secondary: Navy Blue */
+    --secondary: 220 70% 25%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 40 20% 96%;
+    --muted-foreground: 220 10% 40%;
+
+    /* Accent: Gold */
+    --accent: 43 74% 49%;
+    --accent-foreground: 220 40% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 85%;
+    --input: 220 13% 85%;
+    --ring: 220 40% 15%;
+
+    --chart-1: 0 100% 27%; /* Dark Red */
+    --chart-2: 220 70% 25%; /* Navy Blue */
+    --chart-3: 43 74% 49%; /* Gold */
+    --chart-4: 25 60% 40%; /* Leather Brown */
+    --chart-5: 40 33% 98%; /* Cream */
+
+    --radius: 0.5rem
+  }
+  
+  .dark {
+    --background: 220 40% 15%; /* Dark navy background */
+    --foreground: 40 33% 98%; /* Light cream text */
+
+    --card: 220 40% 18%;
+    --card-foreground: 40 33% 98%;
+
+    --popover: 220 40% 18%;
+    --popover-foreground: 40 33% 98%;
+
+    /* Primary: Dark Red */
+    --primary: 0 70% 45%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Secondary: Navy Blue */
+    --secondary: 220 50% 35%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 220 40% 25%;
+    --muted-foreground: 40 20% 80%;
+
+    /* Accent: Gold */
+    --accent: 43 60% 55%;
+    --accent-foreground: 220 40% 15%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 40% 30%;
+    --input: 220 40% 30%;
+    --ring: 40 33% 90%;
+
+    --chart-1: 0 70% 45%; /* Dark Red */
+    --chart-2: 220 50% 35%; /* Navy Blue */
+    --chart-3: 43 60% 55%; /* Gold */
+    --chart-4: 25 50% 45%; /* Leather Brown */
+    --chart-5: 40 33% 90%; /* Cream */
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom barbershop styling */
+@layer components {
+  .barbershop-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .barbershop-heading {
+    @apply font-serif text-barbershop-darkred;
+  }
+  
+  .barbershop-card {
+    @apply bg-white border border-barbershop-cream shadow-md rounded-md overflow-hidden;
+  }
+  
+  .barbershop-button-primary {
+    @apply bg-barbershop-darkred text-white hover:bg-barbershop-darkred/90 transition-colors;
+  }
+  
+  .barbershop-button-secondary {
+    @apply bg-barbershop-navyblue text-white hover:bg-barbershop-navyblue/90 transition-colors;
+  }
+  
+  .barbershop-button-accent {
+    @apply bg-barbershop-gold text-barbershop-charcoal hover:bg-barbershop-gold/90 transition-colors;
+  }
 }
