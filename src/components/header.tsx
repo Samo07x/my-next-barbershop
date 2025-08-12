@@ -22,7 +22,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8" role="navigation" aria-label="Main navigation">
             <Link href="/" className="text-barbershop-cream hover:text-barbershop-gold transition-colors">
               Home
             </Link>
@@ -52,6 +52,8 @@ export default function Header() {
             className="md:hidden text-barbershop-cream"
             onClick={toggleMenu}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -59,8 +61,8 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4">
-            <nav className="flex flex-col space-y-4">
+          <div id="mobile-menu" className="md:hidden mt-4 pb-4">
+            <nav className="flex flex-col space-y-4" role="navigation" aria-label="Mobile navigation">
               <Link
                 href="/"
                 className="text-barbershop-cream hover:text-barbershop-gold transition-colors"

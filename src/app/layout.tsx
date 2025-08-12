@@ -20,8 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans min-h-screen flex flex-col`}>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-barbershop-darkred text-white px-4 py-2 z-50">
+          Skip to main content
+        </a>
         <Header />
-        <main className="flex-grow">{children}</main>
+        <main id="main-content" className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>

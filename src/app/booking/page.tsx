@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, User, Scissors, ChevronRight, Check } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-export default function BookingPage() {
+function BookingContent() {
   const searchParams = useSearchParams();
   const preselectedBarber = searchParams.get("barber");
 
@@ -23,6 +23,7 @@ export default function BookingPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const services = [
     { id: "classic-haircut", name: "Classic Haircut", duration: 30, price: 35 },
@@ -79,13 +80,30 @@ export default function BookingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Simulate API call with potential error
+      const response = await new Promise<{ success: boolean }>((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate random booking conflict error for demonstration
+          if (Math.random() < 0.15) {
+            reject(new Error("Selected time slot is no longer available. Please choose a different time."));
+          } else {
+            resolve({ success: true });
+          }
+        }, 1500);
+      });
+      
+      if (response.success) {
+        setIsSuccess(true);
+        setStep(4);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setIsSuccess(true);
-      setStep(4);
-    }, 1500);
+    }
   };
 
   const getSelectedService = () => {
@@ -311,6 +329,20 @@ export default function BookingPage() {
               <h2 className="barbershop-heading text-2xl font-bold mb-8 text-center">Your Information</h2>
               
               <form onSubmit={handleSubmit}>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-red-700">{error}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div>
                     <label htmlFor="name" className="block text-barbershop-navyblue font-medium mb-2">Full Name</label>
@@ -476,5 +508,13 @@ export default function BookingPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <BookingContent />
+    </Suspense>
   );
 } 
