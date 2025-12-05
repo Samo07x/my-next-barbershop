@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, User, Scissors, ChevronRight, Check } from "lucide-react";
@@ -24,6 +24,24 @@ function BookingContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (formData.date && formData.barber) {
+      fetch(`/api/bookings?date=${formData.date}&barberId=${formData.barber}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.bookedSlots) setBookedSlots(data.bookedSlots);
+          else setBookedSlots([]);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch bookings:", err);
+          setBookedSlots([]);
+        });
+    } else {
+      setBookedSlots([]);
+    }
+  }, [formData.date, formData.barber]);
 
   const services = [
     { id: "classic-haircut", name: "Classic Haircut", duration: 30, price: 35 },
@@ -83,22 +101,31 @@ function BookingContent() {
     setError(null);
     
     try {
-      // Simulate API call with potential error
-      const response = await new Promise<{ success: boolean }>((resolve, reject) => {
-        setTimeout(() => {
-          // Simulate random booking conflict error for demonstration
-          if (Math.random() < 0.15) {
-            reject(new Error("Selected time slot is no longer available. Please choose a different time."));
-          } else {
-            resolve({ success: true });
-          }
-        }, 1500);
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          serviceId: formData.service,
+          barberId: formData.barber,
+          date: formData.date,
+          time: formData.time,
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+          notes: formData.notes,
+        }),
       });
-      
-      if (response.success) {
-        setIsSuccess(true);
-        setStep(4);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong. Please try again.");
       }
+      
+      setIsSuccess(true);
+      setStep(4);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -285,19 +312,25 @@ function BookingContent() {
                 <div className="mb-10">
                   <h3 className="text-xl font-serif font-bold text-barbershop-navyblue mb-4">Choose a Time:</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {availableTimes.map((time) => (
-                      <div 
-                        key={time}
-                        className={`border rounded-md p-3 text-center cursor-pointer transition-colors ${
-                          formData.time === time 
-                            ? 'border-barbershop-darkred bg-barbershop-darkred/5 text-barbershop-darkred' 
-                            : 'border-gray-200 hover:border-barbershop-darkred/50'
-                        }`}
-                        onClick={() => handleTimeSelect(time)}
-                      >
-                        {time}
-                      </div>
-                    ))}
+                    {availableTimes.map((time) => {
+                      const isBooked = bookedSlots.includes(time);
+                      return (
+                        <div 
+                          key={time}
+                          className={`border rounded-md p-3 text-center transition-colors ${
+                            isBooked 
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                              : formData.time === time 
+                                ? 'border-barbershop-darkred bg-barbershop-darkred/5 text-barbershop-darkred cursor-pointer' 
+                                : 'border-gray-200 hover:border-barbershop-darkred/50 cursor-pointer'
+                          }`}
+                          onClick={() => !isBooked && handleTimeSelect(time)}
+                        >
+                          {time}
+                          {isBooked && <span className="block text-xs mt-1">Booked</span>}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
